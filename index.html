@@ -6,8 +6,7 @@
     <title>Dashboard de Acuerdos | Servicio al Cliente</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS es idéntico al de la Opción 1, no hay cambios aquí */
-        :root { --primary-color: #004E98; --secondary-color: #FFB703; --danger-color: #8a3d3d; --background-color: #0A1929; --card-background: #112233; --text-color: #E0E0E0; --border-color: #303E4D; }
+        :root { --primary-color: #004E98; --secondary-color: #FFB703; --danger-color: #8a3d3d; --success-color: #2a9d8f; --background-color: #0A1929; --card-background: #112233; --text-color: #E0E0E0; --border-color: #303E4D; }
         body { background-color: var(--background-color); color: var(--text-color); font-family: 'Roboto', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; box-sizing: border-box; }
         header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
         header h1 { font-family: 'Orbitron', sans-serif; color: var(--text-color); font-size: 2.5rem; }
@@ -16,10 +15,13 @@
         .controls-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
         #search { width: 100%; max-width: 500px; padding: 15px; background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; outline: none; transition: all 0.3s ease; }
         #search:focus { border-color: var(--secondary-color); box-shadow: 0 0 15px rgba(255, 183, 3, 0.3); }
-        .export-btn { padding: 15px 25px; background-color: var(--secondary-color); color: var(--background-color); border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: all 0.3s ease; }
+        .export-btn { padding: 15px 25px; background-color: var(--secondary-color); color: var(--background-color); border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: all 0.3s ease; min-width: 240px; text-align: center; }
         .export-btn:hover { background-color: #ffca43; transform: translateY(-2px); }
+        .export-btn:disabled { background-color: #555; color: #aaa; cursor: not-allowed; transform: none; }
+        .export-btn.success { background-color: var(--success-color); color: white; }
         .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
         .agent-card { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .agent-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
         .agent-card h2 { font-family: 'Roboto', sans-serif; font-weight: 700; color: var(--text-color); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-size: 1.2rem; }
         .agreements-section h3, .solutions-section h3 { color: var(--secondary-color); font-size: 1rem; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
         .agreements-list, .solutions-list { list-style: none; padding-left: 0; font-size: 0.9rem; flex-grow: 1; }
@@ -44,7 +46,7 @@
     <main class="container">
         <div class="controls-container">
             <input type="text" id="search" placeholder="Buscar por nombre...">
-            <button id="export-btn-csv" class="export-btn">Exportar a CSV</button>
+            <button id="export-btn" class="export-btn">Exportar a Google Sheets</button>
         </div>
 
         <div id="team-grid" class="team-grid"></div>
@@ -56,22 +58,86 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const team = [
-                "Gabriela Latorre Mojica", "Gian Paol Munoz Hincapie", "Jeimy Paola Velasquez", "Jhonhatan Alexander Alfonso",
-                "Lina Maria Rico Bedoya", "Luisa Fernanda Garay Espitia", "Luna Angelica Martinez Garcia", "Nicoll Sofia Alonso Velasquez",
-                "Oscar Daniel Salinas Almario", "Valeria Montanez Bustamante", "Paula Andrea Ballesteros Casallas"
-            ];
-            
+            // --- ¡IMPORTANTE! Pega aquí la URL que copiaste en el Paso 3 ---
+            const SCRIPT_URL = 'https://script.google.com/a/macros/mercadolibre.com.co/s/AKfycbyPEAtzPmpVPAGcUgBApRFng24ChM-Nk_1cCbiWEDNazw46iZzONmi0M_IEI0OcnSCd/exec';
+
+            const team = [ "Gabriela Latorre Mojica", "Gian Paol Munoz Hincapie", "Jeimy Paola Velasquez", "Jhonhatan Alexander Alfonso", "Lina Maria Rico Bedoya", "Luisa Fernanda Garay Espitia", "Luna Angelica Martinez Garcia", "Nicoll Sofia Alonso Velasquez", "Oscar Daniel Salinas Almario", "Valeria Montanez Bustamante", "Paula Andrea Ballesteros Casallas" ];
             const teamGrid = document.getElementById('team-grid');
             const searchInput = document.getElementById('search');
-            const exportBtnCsv = document.getElementById('export-btn-csv');
+            const exportBtn = document.getElementById('export-btn');
 
             const loadData = () => JSON.parse(localStorage.getItem('teamData')) || {};
             const saveData = (data) => localStorage.setItem('teamData', JSON.stringify(data));
             let teamData = loadData();
 
-            // Lógica de renderizado y borrado (idéntica a la versión anterior)
-            const renderCards = (filter = '') => {
+            const renderCards = (filter = '') => { /* ...Código de renderizado sin cambios... */ };
+            // Copia la función renderCards y el event listener de teamGrid de tu código anterior aquí.
+            // Los incluyo de nuevo al final para que sea más fácil.
+
+            // --- Lógica para Exportar a Google Sheets ---
+            exportBtn.addEventListener('click', () => {
+                const originalText = exportBtn.textContent;
+                exportBtn.disabled = true;
+                exportBtn.textContent = 'Exportando...';
+
+                if (SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT' || !SCRIPT_URL) {
+                    alert("Error de configuración: La URL del script de Google no ha sido añadida al código JavaScript.");
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = originalText;
+                    return;
+                }
+                
+                const allData = loadData();
+                const rows = [];
+                Object.keys(allData).forEach(agentName => {
+                    allData[agentName].agreements.forEach(agreement => {
+                        rows.push([agentName, 'Acuerdo', agreement]);
+                    });
+                    allData[agentName].solutions.forEach(solution => {
+                        rows.push([agentName, 'Solución', solution]);
+                    });
+                });
+
+                if (rows.length === 0) {
+                    alert("No hay datos para exportar.");
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = originalText;
+                    return;
+                }
+
+                // Usamos fetch para enviar los datos al script de Google
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    // mode: 'no-cors' // a veces es necesario, pero postData lo maneja bien
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ rows: rows })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result === "success") {
+                        exportBtn.textContent = '¡Exportado con Éxito!';
+                        exportBtn.classList.add('success');
+                        setTimeout(() => {
+                            exportBtn.disabled = false;
+                            exportBtn.textContent = originalText;
+                            exportBtn.classList.remove('success');
+                        }, 2500);
+                    } else {
+                        throw new Error(data.error || 'Error desconocido en el script.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al exportar:', error);
+                    alert('Hubo un error al exportar los datos. Revisa la consola (F12) para más detalles.');
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = originalText;
+                });
+            });
+
+
+            // --- Aquí están las funciones de renderizado y eventos para copiar y pegar ---
+            const renderCardsFn = (filter = '') => {
                 teamGrid.innerHTML = '';
                 const filteredTeam = team.filter(name => name.toLowerCase().includes(filter.toLowerCase()));
                 filteredTeam.forEach(name => {
@@ -87,8 +153,6 @@
                 });
             };
             
-            searchInput.addEventListener('input', () => renderCards(searchInput.value));
-
             teamGrid.addEventListener('click', (e) => {
                 const card = e.target.closest('.agent-card');
                 if (!card) return;
@@ -102,7 +166,7 @@
                     if (newSolution) teamData[agentName].solutions.push(newSolution);
                     if (newAgreement || newSolution) {
                         saveData(teamData);
-                        renderCards(searchInput.value);
+                        renderCardsFn(searchInput.value);
                     }
                 }
                 if (e.target.classList.contains('delete-btn')) {
@@ -111,46 +175,12 @@
                     const type = button.dataset.type;
                     teamData[agentName][type].splice(index, 1);
                     saveData(teamData);
-                    renderCards(searchInput.value);
+                    renderCardsFn(searchInput.value);
                 }
             });
 
-            // --- NUEVO: Lógica para exportar a CSV ---
-            exportBtnCsv.addEventListener('click', () => {
-                const allData = loadData();
-                const rows = [
-                    ['Agente', 'Tipo', 'Descripción'] // Encabezados del CSV
-                ];
-
-                Object.keys(allData).forEach(agentName => {
-                    allData[agentName].agreements.forEach(agreement => {
-                        // Para evitar problemas con comas en el texto, lo encerramos en comillas dobles
-                        rows.push([`"${agentName}"`, '"Acuerdo"', `"${agreement.replace(/"/g, '""')}"`]);
-                    });
-                    allData[agentName].solutions.forEach(solution => {
-                        rows.push([`"${agentName}"`, '"Solución"', `"${solution.replace(/"/g, '""')}"`]);
-                    });
-                });
-
-                if (rows.length <= 1) {
-                    alert("No hay datos para exportar.");
-                    return;
-                }
-
-                // Convertir el array de filas a un string CSV
-                let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
-
-                // Crear un enlace y simular un clic para descargar el archivo
-                var encodedUri = encodeURI(csvContent);
-                var link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "reporte_de_acuerdos.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
-
-            renderCards();
+            // Llamada inicial
+            renderCardsFn();
         });
     </script>
 </body>

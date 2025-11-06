@@ -19,15 +19,67 @@
         .export-btn:hover { background-color: #ffca43; transform: translateY(-2px); }
         .export-btn:disabled { background-color: #555; color: #aaa; cursor: not-allowed; transform: none; }
         .export-btn.success { background-color: var(--success-color); color: white; }
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
         .agent-card { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .agent-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
         .agent-card h2 { font-family: 'Roboto', sans-serif; font-weight: 700; color: var(--text-color); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-size: 1.2rem; }
         .agreements-section h3, .solutions-section h3 { color: var(--secondary-color); font-size: 1rem; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
-        .agreements-list, .solutions-list { list-style: none; padding-left: 0; font-size: 0.9rem; flex-grow: 1; }
-        .agreements-list li, .solutions-list li { background-color: #1A2D40; padding: 10px; border-radius: 5px; margin-bottom: 8px; border-left: 3px solid var(--primary-color); display: flex; justify-content: space-between; align-items: center; gap: 10px; word-wrap: break-word; }
-        .item-text { flex-grow: 1; }
-        .no-items { color: #8b949e; font-style: italic; border-left-color: var(--border-color) !important; background-color: transparent !important; justify-content: flex-start; }
+        
+        /* --- INICIO DE NUEVOS ESTILOS PARA LAS TABLAS --- */
+        .agreements-section table, .solutions-section table {
+            width: 100%;
+            border-collapse: separate; /* Permite espacio entre filas */
+            border-spacing: 0 8px; /* 0 horizontal, 8px vertical */
+            margin-top: 10px;
+        }
+
+        th {
+            color: var(--secondary-color);
+            text-align: left;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 0 10px 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            background-color: #1A2D40;
+            padding: 12px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        /* Estilo para la primera celda (descripción) */
+        td:first-child {
+            border-left: 3px solid var(--primary-color);
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            width: 100%; /* Ocupa todo el espacio posible */
+        }
+        
+        /* Estilo para la última celda (acción/botón) */
+        td:last-child {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        
+        /* Celda para el botón de borrar */
+        .action-cell {
+            text-align: right;
+            width: 1%; /* Evita que la celda se estire innecesariamente */
+            white-space: nowrap;
+        }
+        
+        /* Estilo para el mensaje de "Sin registros" */
+        .no-items-row td {
+            background-color: transparent !important;
+            color: #8b949e;
+            font-style: italic;
+            border-left: 3px solid var(--border-color) !important;
+            text-align: center;
+        }
+        /* --- FIN DE NUEVOS ESTILOS PARA LAS TABLAS --- */
+
         .delete-btn { background-color: var(--danger-color); color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; font-weight: bold; flex-shrink: 0; transition: background-color 0.2s ease; }
         .delete-btn:hover { background-color: #a35454; }
         .add-form { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
@@ -40,7 +92,7 @@
 <body>
     <header>
         <h1>Dashboard de <span>Acuerdos</span> Semanales</h1>
-        <p>Los linineitors</p>
+        <p>Equipo de Servicio al Cliente</p>
     </header>
 
     <main class="container">
@@ -58,8 +110,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- ¡IMPORTANTE! Pega aquí la URL que copiaste en el Paso 3 ---
-            const SCRIPT_URL = 'https://script.google.com/a/macros/mercadolibre.com.co/s/AKfycbyPEAtzPmpVPAGcUgBApRFng24ChM-Nk_1cCbiWEDNazw46iZzONmi0M_IEI0OcnSCd/exec';
+            const SCRIPT_URL = 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT';
 
             const team = [ "Gabriela Latorre Mojica", "Gian Paol Munoz Hincapie", "Jeimy Paola Velasquez", "Jhonhatan Alexander Alfonso", "Lina Maria Rico Bedoya", "Luisa Fernanda Garay Espitia", "Luna Angelica Martinez Garcia", "Nicoll Sofia Alonso Velasquez", "Oscar Daniel Salinas Almario", "Valeria Montanez Bustamante", "Paula Andrea Ballesteros Casallas" ];
             const teamGrid = document.getElementById('team-grid');
@@ -70,88 +121,106 @@
             const saveData = (data) => localStorage.setItem('teamData', JSON.stringify(data));
             let teamData = loadData();
 
-            const renderCards = (filter = '') => { /* ...Código de renderizado sin cambios... */ };
-            // Copia la función renderCards y el event listener de teamGrid de tu código anterior aquí.
-            // Los incluyo de nuevo al final para que sea más fácil.
+            // --- FUNCIÓN DE RENDERIZADO MODIFICADA PARA USAR TABLAS ---
+            const renderCardsFn = (filter = '') => {
+                teamGrid.innerHTML = '';
+                const filteredTeam = team.filter(name => name.toLowerCase().includes(filter.toLowerCase()));
+                
+                filteredTeam.forEach(name => {
+                    if (!teamData[name]) teamData[name] = { agreements: [], solutions: [] };
+                    const agentData = teamData[name];
 
-            // --- Lógica para Exportar a Google Sheets ---
+                    // Generar filas para la tabla de Acuerdos
+                    const agreementsRowsHtml = agentData.agreements.length > 0
+                        ? agentData.agreements.map((item, index) => `
+                            <tr>
+                                <td>${item}</td>
+                                <td class="action-cell">
+                                    <button class="delete-btn" data-index="${index}" data-type="agreements">Borrar</button>
+                                </td>
+                            </tr>`).join('')
+                        : '<tr class="no-items-row"><td colspan="2">Sin acuerdos registrados.</td></tr>';
+
+                    // Generar filas para la tabla de Soluciones
+                    const solutionsRowsHtml = agentData.solutions.length > 0
+                        ? agentData.solutions.map((item, index) => `
+                            <tr>
+                                <td>${item}</td>
+                                <td class="action-cell">
+                                    <button class="delete-btn" data-index="${index}" data-type="solutions">Borrar</button>
+                                </td>
+                            </tr>`).join('')
+                        : '<tr class="no-items-row"><td colspan="2">Sin soluciones propuestas.</td></tr>';
+
+                    const card = document.createElement('div');
+                    card.className = 'agent-card';
+                    card.setAttribute('data-name', name);
+
+                    // La estructura de la tarjeta ahora contiene tablas
+                    card.innerHTML = `
+                        <h2>${name}</h2>
+                        
+                        <div class="agreements-section">
+                            <h3>Acuerdos</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Descripción</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${agreementsRowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="solutions-section">
+                            <h3>Posibles Soluciones</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Descripción</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${solutionsRowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="add-form">
+                            <textarea class="agreement-input" placeholder="Añadir nuevo acuerdo..." rows="2"></textarea>
+                            <textarea class="solution-input" placeholder="Añadir posible solución..." rows="2"></textarea>
+                            <button class="add-btn">Añadir</button>
+                        </div>
+                    `;
+                    teamGrid.appendChild(card);
+                });
+            };
+
+            // El resto de la lógica de JavaScript no necesita cambios
+            
+            searchInput.addEventListener('input', () => renderCardsFn(searchInput.value));
+
             exportBtn.addEventListener('click', () => {
                 const originalText = exportBtn.textContent;
                 exportBtn.disabled = true;
                 exportBtn.textContent = 'Exportando...';
-
-                if (SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT' || !SCRIPT_URL) {
-                    alert("Error de configuración: La URL del script de Google no ha sido añadida al código JavaScript.");
-                    exportBtn.disabled = false;
-                    exportBtn.textContent = originalText;
-                    return;
-                }
-                
+                if (!SCRIPT_URL || SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT') { alert("Error de configuración: La URL del script de Google no ha sido añadida al código JavaScript."); exportBtn.disabled = false; exportBtn.textContent = originalText; return; }
                 const allData = loadData();
                 const rows = [];
-                Object.keys(allData).forEach(agentName => {
-                    allData[agentName].agreements.forEach(agreement => {
-                        rows.push([agentName, 'Acuerdo', agreement]);
-                    });
-                    allData[agentName].solutions.forEach(solution => {
-                        rows.push([agentName, 'Solución', solution]);
-                    });
-                });
-
-                if (rows.length === 0) {
-                    alert("No hay datos para exportar.");
-                    exportBtn.disabled = false;
-                    exportBtn.textContent = originalText;
-                    return;
-                }
-
-                // Usamos fetch para enviar los datos al script de Google
-                fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    // mode: 'no-cors' // a veces es necesario, pero postData lo maneja bien
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ rows: rows })
-                })
+                Object.keys(allData).forEach(agentName => { allData[agentName].agreements.forEach(agreement => { rows.push([agentName, 'Acuerdo', agreement]); }); allData[agentName].solutions.forEach(solution => { rows.push([agentName, 'Solución', solution]); }); });
+                if (rows.length === 0) { alert("No hay datos para exportar."); exportBtn.disabled = false; exportBtn.textContent = originalText; return; }
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'cors', cache: 'no-cache', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ rows: rows }), redirect: 'follow' })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.result === "success") {
-                        exportBtn.textContent = '¡Exportado con Éxito!';
-                        exportBtn.classList.add('success');
-                        setTimeout(() => {
-                            exportBtn.disabled = false;
-                            exportBtn.textContent = originalText;
-                            exportBtn.classList.remove('success');
-                        }, 2500);
-                    } else {
-                        throw new Error(data.error || 'Error desconocido en el script.');
-                    }
+                    if (data.result === "success") { exportBtn.textContent = '¡Exportado con Éxito!'; exportBtn.classList.add('success'); setTimeout(() => { exportBtn.disabled = false; exportBtn.textContent = originalText; exportBtn.classList.remove('success'); }, 2500); } 
+                    else { throw new Error(data.error || 'El script devolvió un error desconocido.'); }
                 })
-                .catch(error => {
-                    console.error('Error al exportar:', error);
-                    alert('Hubo un error al exportar los datos. Revisa la consola (F12) para más detalles.');
-                    exportBtn.disabled = false;
-                    exportBtn.textContent = originalText;
-                });
+                .catch(error => { console.error('Error al exportar:', error); alert('Hubo un error al exportar los datos. Revisa la consola (F12) para más detalles.'); exportBtn.disabled = false; exportBtn.textContent = originalText; });
             });
-
-
-            // --- Aquí están las funciones de renderizado y eventos para copiar y pegar ---
-            const renderCardsFn = (filter = '') => {
-                teamGrid.innerHTML = '';
-                const filteredTeam = team.filter(name => name.toLowerCase().includes(filter.toLowerCase()));
-                filteredTeam.forEach(name => {
-                    if (!teamData[name]) teamData[name] = { agreements: [], solutions: [] };
-                    const agentData = teamData[name];
-                    const agreementsHtml = agentData.agreements.length > 0 ? agentData.agreements.map((item, index) => `<li><span class="item-text">${item}</span><button class="delete-btn" data-index="${index}" data-type="agreements">Borrar</button></li>`).join('') : '<li class="no-items">Sin acuerdos registrados.</li>';
-                    const solutionsHtml = agentData.solutions.length > 0 ? agentData.solutions.map((item, index) => `<li><span class="item-text">${item}</span><button class="delete-btn" data-index="${index}" data-type="solutions">Borrar</button></li>`).join('') : '<li class="no-items">Sin soluciones propuestas.</li>';
-                    const card = document.createElement('div');
-                    card.className = 'agent-card';
-                    card.setAttribute('data-name', name);
-                    card.innerHTML = `<h2>${name}</h2><div class="agreements-section"><h3>Acuerdos</h3><ul class="agreements-list">${agreementsHtml}</ul></div><div class="solutions-section"><h3>Posibles Soluciones</h3><ul class="solutions-list">${solutionsHtml}</ul></div><div class="add-form"><textarea class="agreement-input" placeholder="Añadir nuevo acuerdo..." rows="2"></textarea><textarea class="solution-input" placeholder="Añadir posible solución..." rows="2"></textarea><button class="add-btn">Añadir</button></div>`;
-                    teamGrid.appendChild(card);
-                });
-            };
             
             teamGrid.addEventListener('click', (e) => {
                 const card = e.target.closest('.agent-card');
@@ -164,10 +233,7 @@
                     const newSolution = solutionInput.value.trim();
                     if (newAgreement) teamData[agentName].agreements.push(newAgreement);
                     if (newSolution) teamData[agentName].solutions.push(newSolution);
-                    if (newAgreement || newSolution) {
-                        saveData(teamData);
-                        renderCardsFn(searchInput.value);
-                    }
+                    if (newAgreement || newSolution) { saveData(teamData); renderCardsFn(searchInput.value); }
                 }
                 if (e.target.classList.contains('delete-btn')) {
                     const button = e.target;
@@ -179,7 +245,6 @@
                 }
             });
 
-            // Llamada inicial
             renderCardsFn();
         });
     </script>

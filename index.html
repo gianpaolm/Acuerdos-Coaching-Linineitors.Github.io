@@ -6,7 +6,7 @@
     <title>Dashboard de Acuerdos | Servicio al Cliente</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-color: #004E98; --secondary-color: #FFB703; --danger-color: #8a3d3d; --background-color: #0A1929; --card-background: #112233; --text-color: #E0E0E0; --border-color: #303E4D; }
+        :root { --primary-color: #004E98; --secondary-color: #FFB703; --danger-color: #8a3d3d; --success-color: #2a9d8f; --background-color: #0A1929; --card-background: #112233; --text-color: #E0E0E0; --border-color: #303E4D; }
         body { background-color: var(--background-color); color: var(--text-color); font-family: 'Roboto', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; box-sizing: border-box; }
         header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
         header h1 { font-family: 'Orbitron', sans-serif; color: var(--text-color); font-size: 2.5rem; }
@@ -17,6 +17,8 @@
         #search:focus { border-color: var(--secondary-color); box-shadow: 0 0 15px rgba(255, 183, 3, 0.3); }
         .export-btn { padding: 15px 25px; background-color: var(--secondary-color); color: var(--background-color); border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: all 0.3s ease; min-width: 240px; text-align: center; }
         .export-btn:hover { background-color: #ffca43; transform: translateY(-2px); }
+        .export-btn:disabled { background-color: #555; color: #aaa; cursor: not-allowed; transform: none; }
+        .export-btn.success { background-color: var(--success-color); color: white; }
         .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
         .agent-card { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .agent-card h2 { font-family: 'Roboto', sans-serif; font-weight: 700; color: var(--text-color); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-size: 1.2rem; }
@@ -25,13 +27,12 @@
         .agent-card th { color: var(--secondary-color); text-align: left; font-size: 0.8rem; text-transform: uppercase; padding: 0 10px 5px; border-bottom: 1px solid var(--border-color); }
         .agent-card td { background-color: #1A2D40; padding: 12px; font-size: 0.9rem; vertical-align: middle; }
         .agent-card td:first-child { border-left: 3px solid var(--primary-color); border-top-left-radius: 5px; border-bottom-left-radius: 5px; width: 100%; }
-        .agent-card td:last-child { border-top-right-radius: 5px; border-bottom-right-radius: 5px; }
         .action-cell { text-align: right; width: 1%; white-space: nowrap; }
         .no-items-row td { background-color: transparent !important; color: #8b949e; font-style: italic; border-left: 3px solid var(--border-color) !important; text-align: center; }
-        .delete-btn { background-color: var(--danger-color); color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; font-weight: bold; flex-shrink: 0; transition: background-color 0.2s ease; }
+        .delete-btn { background-color: var(--danger-color); color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; font-weight: bold; }
         .add-form { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
         .add-form textarea { width: 100%; padding: 10px; background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-color); box-sizing: border-box; resize: vertical; }
-        .add-form .add-btn { padding: 12px; background-color: var(--primary-color); color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: background-color 0.3s ease; }
+        .add-form .add-btn { padding: 12px; background-color: var(--primary-color); color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         .general-table-container { margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--border-color); }
         .general-table-container h2 { text-align: center; font-family: 'Orbitron', sans-serif; margin-bottom: 20px; }
         #general-table { width: 100%; border-collapse: collapse; }
@@ -46,8 +47,7 @@
     <main class="container">
         <div class="controls-container">
             <input type="text" id="search" placeholder="Buscar por nombre...">
-            <!-- BOTÓN ACTUALIZADO PARA GENERAR EL REPORTE ESTÁTICO -->
-            <button id="export-html-btn" class="export-btn">Generar Reporte para Excel</button>
+            <button id="export-btn" class="export-btn">Exportar a Google Sheets</button>
         </div>
         <div id="team-grid" class="team-grid"></div>
         <div class="general-table-container">
@@ -61,81 +61,81 @@
     <footer><p>&copy; 2024 | Herramienta de Seguimiento para el Equipo</p></footer>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- URL DEL SCRIPT INSERTADA ---
+            const SCRIPT_URL = 'https://script.google.com/a/macros/mercadolibre.com.co/s/AKfycbxCV_ygI9LDwRObBFbFDCeP5pLAf8bbyz0QxHWAU_GWq-UFWrJrhQheFx2rhkpIq8L3/exec';
+
             const team = [ "Gabriela Latorre Mojica", "Gian Paol Munoz Hincapie", "Jeimy Paola Velasquez", "Jhonhatan Alexander Alfonso", "Lina Maria Rico Bedoya", "Luisa Fernanda Garay Espitia", "Luna Angelica Martinez Garcia", "Nicoll Sofia Alonso Velasquez", "Oscar Daniel Salinas Almario", "Valeria Montanez Bustamante", "Paula Andrea Ballesteros Casallas" ];
             const teamGrid = document.getElementById('team-grid');
             const searchInput = document.getElementById('search');
-            const exportHtmlBtn = document.getElementById('export-html-btn');
+            const exportBtn = document.getElementById('export-btn');
 
             const loadData = () => JSON.parse(localStorage.getItem('teamData')) || {};
             const saveData = (data) => localStorage.setItem('teamData', JSON.stringify(data));
             let teamData = loadData();
 
-            // --- LÓGICA PARA GENERAR Y DESCARGAR EL ARCHIVO HTML ESTÁTICO ---
-            exportHtmlBtn.addEventListener('click', () => {
-                const allData = loadData();
-                let tableRows = '';
-                let hasAnyEntry = false;
+            exportBtn.addEventListener('click', () => {
+                const originalText = exportBtn.textContent;
+                exportBtn.disabled = true;
+                exportBtn.textContent = 'Exportando...';
 
+                if (!SCRIPT_URL || SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT') {
+                    alert("Error: La URL del script de Google no ha sido configurada.");
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = originalText;
+                    return;
+                }
+
+                const allData = loadData();
+                const rowsToSend = [];
+                
                 team.forEach(agentName => {
                     const agentData = allData[agentName];
                     if (agentData && (agentData.agreements.length > 0 || agentData.solutions.length > 0)) {
-                        hasAnyEntry = true;
-                        // Usamos `encodeURIComponent` para asegurar que caracteres especiales no rompan el HTML
-                        const agreementsText = agentData.agreements.map(item => item.text).join('<br>');
-                        const solutionsText = agentData.solutions.map(item => item.text).join('<br>');
-                        tableRows += `<tr><td>${agentName}</td><td>${agreementsText}</td><td>${solutionsText}</td></tr>\n`;
+                        const agreementsText = agentData.agreements.map(item => item.text).join('\n');
+                        const solutionsText = agentData.solutions.map(item => item.text).join('\n');
+                        
+                        rowsToSend.push({
+                            agent: agentName,
+                            agreements: agreementsText,
+                            solutions: solutionsText
+                        });
                     }
                 });
-
-                if (!hasAnyEntry) {
-                    alert("No hay datos para generar el reporte.");
+                
+                if (rowsToSend.length === 0) {
+                    alert("No hay datos para exportar.");
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = originalText;
                     return;
                 }
-                
-                // Creamos el contenido del archivo HTML estático
-                const htmlContent = `
-                    <!DOCTYPE html>
-                    <html lang="es">
-                    <head>
-                        <meta charset="UTF-8">
-                        <title>Reporte de Acuerdos</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; }
-                            table { width: 100%; border-collapse: collapse; }
-                            th, td { border: 1px solid #cccccc; padding: 8px; text-align: left; vertical-align: top; }
-                            th { background-color: #f2f2f2; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>Reporte General</h1>
-                        <!-- El 'index' de la tabla para IMPORTHTML es 1 -->
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nombre del agente</th>
-                                    <th>Acuerdo</th>
-                                    <th>Posible solucion</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${tableRows}
-                            </tbody>
-                        </table>
-                    </body>
-                    </html>`;
 
-                const blob = new Blob([htmlContent], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'reporte_final.html';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ rows: rowsToSend })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result === "success") {
+                        exportBtn.textContent = '¡Exportado con Éxito!';
+                        exportBtn.classList.add('success');
+                        setTimeout(() => {
+                            exportBtn.disabled = false;
+                            exportBtn.textContent = originalText;
+                            exportBtn.classList.remove('success');
+                        }, 2500);
+                    } else { throw new Error(data.error || 'Error desconocido.'); }
+                })
+                .catch(error => {
+                    console.error('Error al exportar:', error);
+                    alert('Hubo un error al exportar. Revisa la consola (F12).');
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = originalText;
+                });
             });
-            
-            // --- El resto del código que hace funcionar tu dashboard (sin cambios) ---
+
             const renderGeneralTableFn = () => {
                 const tableBody = document.getElementById('general-table-body');
                 tableBody.innerHTML = '';

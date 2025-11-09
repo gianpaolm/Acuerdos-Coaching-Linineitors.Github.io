@@ -24,68 +24,30 @@
         .agent-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
         .agent-card h2 { font-family: 'Roboto', sans-serif; font-weight: 700; color: var(--text-color); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-size: 1.2rem; }
         .agreements-section h3, .solutions-section h3 { color: var(--secondary-color); font-size: 1rem; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
-        
-        /* --- INICIO DE NUEVOS ESTILOS PARA LAS TABLAS --- */
-        .agreements-section table, .solutions-section table {
-            width: 100%;
-            border-collapse: separate; /* Permite espacio entre filas */
-            border-spacing: 0 8px; /* 0 horizontal, 8px vertical */
-            margin-top: 10px;
-        }
-
-        th {
-            color: var(--secondary-color);
-            text-align: left;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            padding: 0 10px 5px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        td {
-            background-color: #1A2D40;
-            padding: 12px;
-            font-size: 0.9rem;
-            vertical-align: middle;
-        }
-
-        /* Estilo para la primera celda (descripción) */
-        td:first-child {
-            border-left: 3px solid var(--primary-color);
-            border-top-left-radius: 5px;
-            border-bottom-left-radius: 5px;
-            width: 100%; /* Ocupa todo el espacio posible */
-        }
-        
-        /* Estilo para la última celda (acción/botón) */
-        td:last-child {
-            border-top-right-radius: 5px;
-            border-bottom-right-radius: 5px;
-        }
-        
-        /* Celda para el botón de borrar */
-        .action-cell {
-            text-align: right;
-            width: 1%; /* Evita que la celda se estire innecesariamente */
-            white-space: nowrap;
-        }
-        
-        /* Estilo para el mensaje de "Sin registros" */
-        .no-items-row td {
-            background-color: transparent !important;
-            color: #8b949e;
-            font-style: italic;
-            border-left: 3px solid var(--border-color) !important;
-            text-align: center;
-        }
-        /* --- FIN DE NUEVOS ESTILOS PARA LAS TABLAS --- */
-
+        .agent-card table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 10px; }
+        .agent-card th { color: var(--secondary-color); text-align: left; font-size: 0.8rem; text-transform: uppercase; padding: 0 10px 5px; border-bottom: 1px solid var(--border-color); }
+        .agent-card td { background-color: #1A2D40; padding: 12px; font-size: 0.9rem; vertical-align: middle; }
+        .agent-card td:first-child { border-left: 3px solid var(--primary-color); border-top-left-radius: 5px; border-bottom-left-radius: 5px; width: 100%; }
+        .agent-card td:last-child { border-top-right-radius: 5px; border-bottom-right-radius: 5px; }
+        .action-cell { text-align: right; width: 1%; white-space: nowrap; }
+        .no-items-row td { background-color: transparent !important; color: #8b949e; font-style: italic; border-left: 3px solid var(--border-color) !important; text-align: center; }
         .delete-btn { background-color: var(--danger-color); color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; font-weight: bold; flex-shrink: 0; transition: background-color 0.2s ease; }
         .delete-btn:hover { background-color: #a35454; }
         .add-form { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
         .add-form textarea { width: 100%; padding: 10px; background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-color); box-sizing: border-box; resize: vertical; }
         .add-form .add-btn { padding: 12px; background-color: var(--primary-color); color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: background-color 0.3s ease; }
         .add-form .add-btn:hover { background-color: #006DC1; }
+        
+        /* --- ESTILOS PARA LA TABLA GENERAL --- */
+        .general-table-container { margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--border-color); }
+        .general-table-container h2 { text-align: center; font-family: 'Orbitron', sans-serif; margin-bottom: 20px; }
+        #general-table { width: 100%; border-collapse: collapse; }
+        #general-table th, #general-table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: top; }
+        #general-table th { background-color: var(--card-background); color: var(--secondary-color); position: sticky; top: 0; z-index: 10; }
+        #general-table tr:nth-child(even) { background-color: rgba(26, 45, 64, 0.5); }
+        #general-table tr:hover { background-color: var(--card-background); }
+        #general-table td { font-size: 0.95rem; }
+
         footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color); color: #8b949e; }
     </style>
 </head>
@@ -102,6 +64,23 @@
         </div>
 
         <div id="team-grid" class="team-grid"></div>
+
+        <!-- --- SECCIÓN DE TABLA GENERAL (MODIFICADA) --- -->
+        <div class="general-table-container">
+            <h2>Tabla General de Registros</h2>
+            <table id="general-table">
+                <thead>
+                    <tr>
+                        <th>Nombre del agente</th>
+                        <th>Acuerdo</th>
+                        <th>Posible solucion</th>
+                    </tr>
+                </thead>
+                <tbody id="general-table-body">
+                    <!-- Las filas se generarán con JavaScript -->
+                </tbody>
+            </table>
+        </div>
     </main>
 
     <footer>
@@ -121,7 +100,43 @@
             const saveData = (data) => localStorage.setItem('teamData', JSON.stringify(data));
             let teamData = loadData();
 
-            // --- FUNCIÓN DE RENDERIZADO MODIFICADA PARA USAR TABLAS ---
+            // --- FUNCIÓN DE TABLA GENERAL (COMPLETAMENTE REESCRITA) ---
+            const renderGeneralTable = () => {
+                const tableBody = document.getElementById('general-table-body');
+                tableBody.innerHTML = '';
+                const allData = loadData();
+                let hasAnyEntry = false;
+
+                team.forEach(agentName => {
+                    const agentData = allData[agentName];
+
+                    if (agentData && (agentData.agreements.length > 0 || agentData.solutions.length > 0)) {
+                        hasAnyEntry = true;
+
+                        // Consolida todos los acuerdos en una celda, separados por <br>
+                        const agreementsHtml = agentData.agreements
+                            .map(item => item.text)
+                            .join('<br>');
+
+                        // Consolida todas las soluciones en una celda
+                        const solutionsHtml = agentData.solutions
+                            .map(item => item.text)
+                            .join('<br>');
+                        
+                        const row = `<tr>
+                                        <td>${agentName}</td>
+                                        <td>${agreementsHtml}</td>
+                                        <td>${solutionsHtml}</td>
+                                    </tr>`;
+                        tableBody.innerHTML += row;
+                    }
+                });
+
+                if (!hasAnyEntry) {
+                    tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; font-style: italic;">No hay registros para mostrar.</td></tr>';
+                }
+            };
+
             const renderCardsFn = (filter = '') => {
                 teamGrid.innerHTML = '';
                 const filteredTeam = team.filter(name => name.toLowerCase().includes(filter.toLowerCase()));
@@ -130,80 +145,21 @@
                     if (!teamData[name]) teamData[name] = { agreements: [], solutions: [] };
                     const agentData = teamData[name];
 
-                    // Generar filas para la tabla de Acuerdos
-                    const agreementsRowsHtml = agentData.agreements.length > 0
-                        ? agentData.agreements.map((item, index) => `
-                            <tr>
-                                <td>${item}</td>
-                                <td class="action-cell">
-                                    <button class="delete-btn" data-index="${index}" data-type="agreements">Borrar</button>
-                                </td>
-                            </tr>`).join('')
-                        : '<tr class="no-items-row"><td colspan="2">Sin acuerdos registrados.</td></tr>';
-
-                    // Generar filas para la tabla de Soluciones
-                    const solutionsRowsHtml = agentData.solutions.length > 0
-                        ? agentData.solutions.map((item, index) => `
-                            <tr>
-                                <td>${item}</td>
-                                <td class="action-cell">
-                                    <button class="delete-btn" data-index="${index}" data-type="solutions">Borrar</button>
-                                </td>
-                            </tr>`).join('')
-                        : '<tr class="no-items-row"><td colspan="2">Sin soluciones propuestas.</td></tr>';
-
+                    const agreementsRowsHtml = agentData.agreements.length > 0 ? agentData.agreements.map((item, index) => `<tr><td>${item.text}</td><td class="action-cell"><button class="delete-btn" data-index="${index}" data-type="agreements">Borrar</button></td></tr>`).join('') : '<tr class="no-items-row"><td colspan="2">Sin acuerdos registrados.</td></tr>';
+                    const solutionsRowsHtml = agentData.solutions.length > 0 ? agentData.solutions.map((item, index) => `<tr><td>${item.text}</td><td class="action-cell"><button class="delete-btn" data-index="${index}" data-type="solutions">Borrar</button></td></tr>`).join('') : '<tr class="no-items-row"><td colspan="2">Sin soluciones propuestas.</td></tr>';
+                    
                     const card = document.createElement('div');
                     card.className = 'agent-card';
                     card.setAttribute('data-name', name);
-
-                    // La estructura de la tarjeta ahora contiene tablas
-                    card.innerHTML = `
-                        <h2>${name}</h2>
-                        
-                        <div class="agreements-section">
-                            <h3>Acuerdos</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Descripción</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${agreementsRowsHtml}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="solutions-section">
-                            <h3>Posibles Soluciones</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Descripción</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${solutionsRowsHtml}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="add-form">
-                            <textarea class="agreement-input" placeholder="Añadir nuevo acuerdo..." rows="2"></textarea>
-                            <textarea class="solution-input" placeholder="Añadir posible solución..." rows="2"></textarea>
-                            <button class="add-btn">Añadir</button>
-                        </div>
-                    `;
+                    card.innerHTML = `<h2>${name}</h2><div class="agreements-section"><h3>Acuerdos</h3><table><thead><tr><th>Descripción</th><th>Acción</th></tr></thead><tbody>${agreementsRowsHtml}</tbody></table></div><div class="solutions-section"><h3>Posibles Soluciones</h3><table><thead><tr><th>Descripción</th><th>Acción</th></tr></thead><tbody>${solutionsRowsHtml}</tbody></table></div><div class="add-form"><textarea class="agreement-input" placeholder="Añadir nuevo acuerdo..." rows="2"></textarea><textarea class="solution-input" placeholder="Añadir posible solución..." rows="2"></textarea><button class="add-btn">Añadir</button></div>`;
                     teamGrid.appendChild(card);
                 });
+
+                // Se actualiza la tabla general cada vez que se renderizan las tarjetas
+                renderGeneralTable();
             };
-
-            // El resto de la lógica de JavaScript no necesita cambios
             
-            searchInput.addEventListener('input', () => renderCardsFn(searchInput.value));
-
+            // --- Lógica de exportar y eventos (sin cambios funcionales) ---
             exportBtn.addEventListener('click', () => {
                 const originalText = exportBtn.textContent;
                 exportBtn.disabled = true;
@@ -211,30 +167,41 @@
                 if (!SCRIPT_URL || SCRIPT_URL === 'PEGA_AQUÍ_LA_URL_DE_TU_SCRIPT') { alert("Error de configuración: La URL del script de Google no ha sido añadida al código JavaScript."); exportBtn.disabled = false; exportBtn.textContent = originalText; return; }
                 const allData = loadData();
                 const rows = [];
-                Object.keys(allData).forEach(agentName => { allData[agentName].agreements.forEach(agreement => { rows.push([agentName, 'Acuerdo', agreement]); }); allData[agentName].solutions.forEach(solution => { rows.push([agentName, 'Solución', solution]); }); });
+                Object.keys(allData).forEach(agentName => { 
+                    allData[agentName].agreements.forEach(item => { rows.push([agentName, 'Acuerdo', item.text]); }); 
+                    allData[agentName].solutions.forEach(item => { rows.push([agentName, 'Solución', item.text]); });
+                });
                 if (rows.length === 0) { alert("No hay datos para exportar."); exportBtn.disabled = false; exportBtn.textContent = originalText; return; }
                 fetch(SCRIPT_URL, { method: 'POST', mode: 'cors', cache: 'no-cache', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ rows: rows }), redirect: 'follow' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.result === "success") { exportBtn.textContent = '¡Exportado con Éxito!'; exportBtn.classList.add('success'); setTimeout(() => { exportBtn.disabled = false; exportBtn.textContent = originalText; exportBtn.classList.remove('success'); }, 2500); } 
-                    else { throw new Error(data.error || 'El script devolvió un error desconocido.'); }
-                })
-                .catch(error => { console.error('Error al exportar:', error); alert('Hubo un error al exportar los datos. Revisa la consola (F12) para más detalles.'); exportBtn.disabled = false; exportBtn.textContent = originalText; });
+                .then(res => res.json()).then(data => { if (data.result === "success") { exportBtn.textContent = '¡Exportado con Éxito!'; exportBtn.classList.add('success'); setTimeout(() => { exportBtn.disabled = false; exportBtn.textContent = originalText; exportBtn.classList.remove('success'); }, 2500); } else { throw new Error(data.error || 'El script devolvió un error desconocido.'); } }).catch(error => { console.error('Error al exportar:', error); alert('Hubo un error al exportar los datos. Revisa la consola (F12) para más detalles.'); exportBtn.disabled = false; exportBtn.textContent = originalText; });
             });
+            
+            searchInput.addEventListener('input', () => renderCardsFn(searchInput.value));
             
             teamGrid.addEventListener('click', (e) => {
                 const card = e.target.closest('.agent-card');
                 if (!card) return;
                 const agentName = card.getAttribute('data-name');
+                
                 if (e.target.classList.contains('add-btn')) {
                     const agreementInput = card.querySelector('.agreement-input');
                     const solutionInput = card.querySelector('.solution-input');
                     const newAgreement = agreementInput.value.trim();
                     const newSolution = solutionInput.value.trim();
-                    if (newAgreement) teamData[agentName].agreements.push(newAgreement);
-                    if (newSolution) teamData[agentName].solutions.push(newSolution);
-                    if (newAgreement || newSolution) { saveData(teamData); renderCardsFn(searchInput.value); }
+                    const entryDate = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+                    if (newAgreement) {
+                        teamData[agentName].agreements.push({ text: newAgreement, date: entryDate });
+                    }
+                    if (newSolution) {
+                        teamData[agentName].solutions.push({ text: newSolution, date: entryDate });
+                    }
+                    if (newAgreement || newSolution) { 
+                        saveData(teamData); 
+                        renderCardsFn(searchInput.value);
+                    }
                 }
+                
                 if (e.target.classList.contains('delete-btn')) {
                     const button = e.target;
                     const index = parseInt(button.dataset.index, 10);
